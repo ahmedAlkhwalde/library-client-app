@@ -1,10 +1,10 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 import pana from "../../../assets/pana.png";
 
 export default function AuthBrandPanel() {
   return (
-    <motion.div
+    <Motion.div
       initial={{ opacity: 0, y: 18 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut", delay: 0.05 }}
@@ -21,6 +21,6 @@ export default function AuthBrandPanel() {
           className="w-full h-full object-contain pointer-events-none"
         />
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }

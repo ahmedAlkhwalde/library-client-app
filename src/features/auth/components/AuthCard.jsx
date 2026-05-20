@@ -1,9 +1,9 @@
 import React from "react";
-import { motion } from "framer-motion";
+import { motion as Motion } from "framer-motion";
 
 export default function AuthCard({ children }) {
   return (
-    <motion.div
+    <Motion.div
       style={{
         background: "var(--ui-card-bg)",
         boxShadow: "var(--ui-card-shadow)",
@@ -16,6 +16,6 @@ export default function AuthCard({ children }) {
       <div className="w-full max-w-[460px] flex flex-col justify-center">
         {children}
       </div>
-    </motion.div>
+    </Motion.div>
   );
 }
