@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import InputField from "./InputField";
 import PasswordField from "./PasswordField";
@@ -109,9 +110,12 @@ export default function LoginForm() {
 
       <div className="text-center text-[14px] text-[var(--ui-text-muted)] font-medium">
         Don&#39;t have an account?{" "}
-        <a href="/app/register" className="text-[var(--ui-link)] font-bold">
+        <Link
+          to="/app/register"
+          className="text-[var(--ui-link)] font-bold cursor-pointer"
+        >
           Create free account
-        </a>
+        </Link>
       </div>
     </form>
   );

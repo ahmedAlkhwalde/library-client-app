@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
@@ -158,13 +159,14 @@ export default function RegisterForm() {
         onBlur={handleBlur}
         error={touched.confirmPassword ? errors.confirmPassword : ""}
       />
-
-      <button
-        type="submit"
-        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98]"
-      >
-        Sign In
-      </button>
+      <Link to="/app/otp">
+        <button
+          type="submit"
+          className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98]"
+        >
+          Sign Up
+        </button>
+      </Link>
 
       <div className="flex items-center text-center my-1.5 before:content-[''] before:flex-1 before:border-b before:border-gray-200 before:mr-3 after:content-[''] after:flex-1 after:border-b after:border-gray-200 after:ml-3">
         <span className="text-gray-400 text-[9px] font-bold uppercase opacity-80">
@@ -174,9 +176,12 @@ export default function RegisterForm() {
 
       <div className="text-center text-[14px] text-[var(--ui-text-muted)] font-medium">
         Already have an account?{" "}
-        <a href="/app/login" className="text-[var(--ui-link)] font-bold">
-          Log in
-        </a>
+        <Link
+          to="/app/login"
+          className="text-[var(--ui-link)] font-bold cursor-pointer"
+        >
+          Sign In
+        </Link>
       </div>
     </form>
   );
