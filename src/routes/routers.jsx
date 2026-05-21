@@ -1,13 +1,24 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Register from "../pages/Register.jsx";
 import Login from "../pages/Login.jsx";
 import OtpVerification from "../pages/OtpVerification.jsx";
+import { MainPage } from "../pages/mainpage.jsx";
+
+function RootRedirect() {
+  const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
+  return (
+    <Navigate
+      to={isAuthenticated ? "/app/main-page" : "/app/login"}
+      replace
+    />
+  );
+}
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/app/register" replace />,
-    // element: <OtpVerification />,
+    element: <RootRedirect />,
   },
   {
     path: "/app/register",
@@ -20,5 +31,9 @@ export const router = createBrowserRouter([
   {
     path: "/app/otp",
     element: <OtpVerification />,
+  },
+  {
+    path: "/app/main-page",
+    element: <MainPage />,
   },
 ]);

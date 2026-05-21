@@ -1,4 +1,6 @@
 import React from "react";
+import { Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import AuthBackgroundOrbs from "../features/auth/components/AuthBackgroundOrbs";
 import AuthBrandPanel from "../features/auth/components/AuthBrandPanel";
 import AuthCard from "../features/auth/components/AuthCard";
@@ -6,6 +8,12 @@ import AuthCardHeader from "../features/auth/components/AuthCardHeader";
 import LoginForm from "../features/auth/components/LoginForm";
 
 export default function Login() {
+  const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
+
+  if (isAuthenticated) {
+    return <Navigate to="/app/main-page" replace />;
+  }
+
   return (
     <div className="min-h-[100dvh] md:h-screen w-full flex items-center md:items-center justify-center md:justify-center focus-within:items-start focus-within:justify-start md:focus-within:items-center md:focus-within:justify-center overflow-y-auto md:overflow-hidden select-none bg-[var(--ui-bg)] relative box-border px-4 sm:px-6 md:px-10 lg:px-16 py-6 md:py-4">
       <AuthBackgroundOrbs />

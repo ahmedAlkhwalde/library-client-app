@@ -1,10 +1,17 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import InputField from "./InputField";
 import PasswordField from "./PasswordField";
+import { useLoginMutation } from "../services/authService";
+import AppSnackbar from "../../../components/AppSnackbar";
+import { setLoginSuccess } from "../store/authSlice";
 
 export default function LoginForm() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const navigateTimeoutRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
   const [values, setValues] = useState({
     email: "",
@@ -12,6 +19,46 @@ export default function LoginForm() {
   });
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
+  const loginMutation = useLoginMutation({
+    onSuccess: (data) => {
+      const token =
+        data?.token || data?.access_token || data?.data?.token || null;
+      const user = data?.user || data?.data?.user || null;
+      if (token) {
+        dispatch(setLoginSuccess({ user, token }));
+      }
+      setSnackbar({
+        open: true,
+        message: "Login successful.",
+        variant: "success",
+      });
+      navigateTimeoutRef.current = setTimeout(
+        () => navigate("/app/main-page"),
+        500,
+      );
+    },
+    onError: (error) => {
+      const responseErrors = error?.response?.data?.errors;
+      const firstError = Array.isArray(responseErrors)
+        ? responseErrors[0]
+        : responseErrors && typeof responseErrors === "object"
+          ? Object.values(responseErrors).flat()?.[0]
+          : null;
+      const message =
+        firstError ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Login failed. Please try again.";
+      setSnackbar({ open: true, message, variant: "error" });
+    },
+  });
+
+  useEffect(() => () => clearTimeout(navigateTimeoutRef.current), []);
 
   const validateField = (field, value) => {
     switch (field) {
@@ -66,7 +113,10 @@ export default function LoginForm() {
     setErrors(nextErrors);
     setTouched({ email: true, password: true });
     if (Object.keys(nextErrors).length === 0) {
-      // Valid form; no submission behavior defined yet.
+      loginMutation.mutate({
+        email: values.email,
+        password: values.password,
+      });
     }
   };
 
@@ -97,9 +147,10 @@ export default function LoginForm() {
 
       <button
         type="submit"
-        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98]"
+        disabled={loginMutation.isPending}
+        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        Sign In
+        {loginMutation.isPending ? "Signing in..." : "Sign In"}
       </button>
 
       <div className="flex items-center text-center my-1.5 before:content-[''] before:flex-1 before:border-b before:border-gray-200 before:mr-3 after:content-[''] after:flex-1 after:border-b after:border-gray-200 after:ml-3">
@@ -117,6 +168,13 @@ export default function LoginForm() {
           Create free account
         </Link>
       </div>
+
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        variant={snackbar.variant}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </form>
   );
 }

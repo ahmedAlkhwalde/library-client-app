@@ -1,14 +1,104 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import logoBranding from "../../../assets/Logo Branding.png";
+import {
+  useResendCodeMutation,
+  useVerifyCodeMutation,
+} from "../services/authService";
+import AppSnackbar from "../../../components/AppSnackbar";
+import { setLoginSuccess } from "../store/authSlice";
 
 const CODE_LENGTH = 6;
+const RESEND_SECONDS = 60;
 
 export default function OtpVerificationForm() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const navigateTimeoutRef = useRef(null);
+  const location = useLocation();
+  const email = location.state?.email || "";
   const [digits, setDigits] = useState(Array(CODE_LENGTH).fill(""));
   const [error, setError] = useState("");
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
+  const [resendSeconds, setResendSeconds] = useState(RESEND_SECONDS);
   const inputRefs = useRef([]);
 
+  const verifyMutation = useVerifyCodeMutation({
+    onSuccess: (data) => {
+      const token =
+        data?.token || data?.access_token || data?.data?.token || null;
+      const user = data?.user || data?.data?.user || null;
+      if (token) {
+        dispatch(setLoginSuccess({ user, token }));
+      }
+      setSnackbar({
+        open: true,
+        message: "Verification successful.",
+        variant: "success",
+      });
+      navigateTimeoutRef.current = setTimeout(
+        () => navigate("/app/main-page"),
+        500,
+      );
+    },
+    onError: (error) => {
+      const responseErrors = error?.response?.data?.errors;
+      const firstError = Array.isArray(responseErrors)
+        ? responseErrors[0]
+        : responseErrors && typeof responseErrors === "object"
+          ? Object.values(responseErrors).flat()?.[0]
+          : null;
+      const message =
+        firstError ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Verification failed. Please try again.";
+      setSnackbar({ open: true, message, variant: "error" });
+    },
+  });
+
+  useEffect(() => () => clearTimeout(navigateTimeoutRef.current), []);
+
+  const resendMutation = useResendCodeMutation({
+    onSuccess: () => {
+      setResendSeconds(RESEND_SECONDS);
+      setSnackbar({
+        open: true,
+        message: "A new verification code has been sent.",
+        variant: "info",
+      });
+    },
+    onError: (error) => {
+      const responseErrors = error?.response?.data?.errors;
+      const firstError = Array.isArray(responseErrors)
+        ? responseErrors[0]
+        : responseErrors && typeof responseErrors === "object"
+          ? Object.values(responseErrors).flat()?.[0]
+          : null;
+      const message =
+        firstError ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Resend failed. Please try again.";
+      setSnackbar({ open: true, message, variant: "error" });
+    },
+  });
+
   const isComplete = digits.every(Boolean);
+
+  useEffect(() => {
+    if (resendSeconds <= 0) return undefined;
+    const timer = setTimeout(
+      () => setResendSeconds((prev) => Math.max(prev - 1, 0)),
+      1000,
+    );
+    return () => clearTimeout(timer);
+  }, [resendSeconds]);
 
   const focusInput = (index) => {
     inputRefs.current[index]?.focus();
@@ -67,9 +157,40 @@ export default function OtpVerificationForm() {
       return;
     }
 
+    if (!email) {
+      setSnackbar({
+        open: true,
+        message: "Email is missing. Please register again.",
+        variant: "error",
+      });
+      return;
+    }
+
     setError("");
-    // Valid code; no submission behavior defined yet.
+    verifyMutation.mutate({
+      email,
+      code: digits.join(""),
+    });
   };
+
+  const handleResend = () => {
+    if (resendSeconds > 0 || resendMutation.isPending) return;
+    if (!email) {
+      setSnackbar({
+        open: true,
+        message: "Email is missing. Please register again.",
+        variant: "error",
+      });
+      return;
+    }
+
+    resendMutation.mutate({ email });
+  };
+
+  const resendLabel =
+    resendSeconds > 0
+      ? `Resend code in 0:${String(resendSeconds).padStart(2, "0")}`
+      : "You can resend the code now";
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 lg:space-y-5">
@@ -89,7 +210,7 @@ export default function OtpVerificationForm() {
             We have sent a 6-digit verification code to
           </p>
           <span className="text-[12px] font-semibold text-[var(--ui-link)]">
-            your@email.com
+            {email || "your@email.com"}
           </span>
         </div>
       </div>
@@ -124,23 +245,34 @@ export default function OtpVerificationForm() {
 
       <button
         type="submit"
-        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-1 active:scale-[0.98]"
+        disabled={verifyMutation.isPending}
+        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-1 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
       >
-        Verify email
+        {verifyMutation.isPending ? "Verifying..." : "Verify email"}
       </button>
 
       <div className="text-center text-[12px] text-[var(--ui-text-muted)] space-y-1">
         <p>
-          Resend code in{" "}
-          <span className="text-[var(--ui-text)] font-semibold">14:30</span>
+          <span className="text-[var(--ui-text)] font-semibold">
+            {resendLabel}
+          </span>
         </p>
         <button
           type="button"
-          className="text-[var(--ui-link)] font-semibold hover:underline cursor-pointer"
+          onClick={handleResend}
+          disabled={resendSeconds > 0 || resendMutation.isPending}
+          className="text-[var(--ui-link)] font-semibold hover:underline cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          Resend
+          {resendMutation.isPending ? "Sending..." : "Resend"}
         </button>
       </div>
+
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        variant={snackbar.variant}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </form>
   );
 }

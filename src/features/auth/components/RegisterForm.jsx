@@ -1,29 +1,68 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import PermIdentityOutlinedIcon from "@mui/icons-material/PermIdentityOutlined";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import MailOutlineIcon from "@mui/icons-material/MailOutline";
 import InputField from "./InputField";
 import PasswordField from "./PasswordField";
+import { useRegisterMutation } from "../services/authService";
+import AppSnackbar from "../../../components/AppSnackbar";
 
 export default function RegisterForm() {
+  const navigate = useNavigate();
+  const navigateTimeoutRef = useRef(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showpassword_confirmation, setShowpassword_confirmation] =
+    useState(false);
   const [values, setValues] = useState({
     name: "",
-    phone: "",
+    mobile: "",
     email: "",
     password: "",
-    confirmPassword: "",
+    password_confirmation: "",
   });
   const [touched, setTouched] = useState({});
   const [errors, setErrors] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    variant: "success",
+  });
+  const registerMutation = useRegisterMutation({
+    onSuccess: () => {
+      setSnackbar({
+        open: true,
+        message: "Registration completed. Check your email for the code.",
+        variant: "success",
+      });
+      navigateTimeoutRef.current = setTimeout(
+        () => navigate("/app/otp", { state: { email: values.email } }),
+        500,
+      );
+    },
+    onError: (error) => {
+      const responseErrors = error?.response?.data?.errors;
+      const firstError = Array.isArray(responseErrors)
+        ? responseErrors[0]
+        : responseErrors && typeof responseErrors === "object"
+          ? Object.values(responseErrors).flat()?.[0]
+          : null;
+      const message =
+        firstError ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Registration failed. Please try again.";
+      setSnackbar({ open: true, message, variant: "error" });
+    },
+  });
+
+  useEffect(() => () => clearTimeout(navigateTimeoutRef.current), []);
 
   const validateField = (field, value, allValues) => {
     switch (field) {
       case "name":
         return value.trim() ? "" : "Name is required.";
-      case "phone":
+      case "mobile":
         return /^\d{10}$/.test(value) ? "" : "Phone number must be 10 digits.";
       case "email":
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
@@ -33,7 +72,7 @@ export default function RegisterForm() {
         return value.length >= 8
           ? ""
           : "Password must be at least 8 characters.";
-      case "confirmPassword":
+      case "password_confirmation":
         if (!value) return "Please confirm your password.";
         return value === allValues.password ? "" : "Passwords do not match.";
       default:
@@ -43,7 +82,7 @@ export default function RegisterForm() {
 
   const validateAll = (allValues) => {
     const nextErrors = {};
-    ["name", "phone", "email", "password", "confirmPassword"].forEach(
+    ["name", "mobile", "email", "password", "password_confirmation"].forEach(
       (field) => {
         const message = validateField(field, allValues[field], allValues);
         if (message) nextErrors[field] = message;
@@ -62,12 +101,12 @@ export default function RegisterForm() {
           [name]: validateField(name, value, next),
         }));
       }
-      if (name === "password" && touched.confirmPassword) {
+      if (name === "password" && touched.password_confirmation) {
         setErrors((prevErrors) => ({
           ...prevErrors,
-          confirmPassword: validateField(
-            "confirmPassword",
-            next.confirmPassword,
+          password_confirmation: validateField(
+            "password_confirmation",
+            next.password_confirmation,
             next,
           ),
         }));
@@ -91,13 +130,19 @@ export default function RegisterForm() {
     setErrors(nextErrors);
     setTouched({
       name: true,
-      phone: true,
+      mobile: true,
       email: true,
       password: true,
-      confirmPassword: true,
+      password_confirmation: true,
     });
     if (Object.keys(nextErrors).length === 0) {
-      // Valid form; no submission behavior defined yet.
+      registerMutation.mutate({
+        name: values.name,
+        mobile: values.mobile,
+        email: values.email,
+        password: values.password,
+        password_confirmation: values.password_confirmation,
+      });
     }
   };
 
@@ -115,15 +160,15 @@ export default function RegisterForm() {
       />
 
       <InputField
-        name="phone"
+        name="mobile"
         label="Phone number"
         type="tel"
         placeholder="0985311857"
         Icon={LocalPhoneOutlinedIcon}
-        value={values.phone}
+        value={values.mobile}
         onChange={handleChange}
         onBlur={handleBlur}
-        error={touched.phone ? errors.phone : ""}
+        error={touched.mobile ? errors.mobile : ""}
       />
 
       <InputField
@@ -150,23 +195,26 @@ export default function RegisterForm() {
       />
 
       <PasswordField
-        name="confirmPassword"
+        name="password_confirmation"
         label="Confirm"
-        show={showConfirmPassword}
-        onToggle={() => setShowConfirmPassword(!showConfirmPassword)}
-        value={values.confirmPassword}
+        show={showpassword_confirmation}
+        onToggle={() =>
+          setShowpassword_confirmation(!showpassword_confirmation)
+        }
+        value={values.password_confirmation}
         onChange={handleChange}
         onBlur={handleBlur}
-        error={touched.confirmPassword ? errors.confirmPassword : ""}
+        error={
+          touched.password_confirmation ? errors.password_confirmation : ""
+        }
       />
-      <Link to="/app/otp">
-        <button
-          type="submit"
-          className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98]"
-        >
-          Sign Up
-        </button>
-      </Link>
+      <button
+        type="submit"
+        disabled={registerMutation.isPending}
+        className="w-full bg-[var(--ui-primary)] hover:bg-[var(--ui-primary-hover)] text-white rounded-full py-2.5 lg:py-3 text-[17px] cursor-pointer font-semibold transition-all mt-2 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+      >
+        {registerMutation.isPending ? "Signing up..." : "Sign Up"}
+      </button>
 
       <div className="flex items-center text-center my-1.5 before:content-[''] before:flex-1 before:border-b before:border-gray-200 before:mr-3 after:content-[''] after:flex-1 after:border-b after:border-gray-200 after:ml-3">
         <span className="text-gray-400 text-[9px] font-bold uppercase opacity-80">
@@ -183,6 +231,13 @@ export default function RegisterForm() {
           Sign In
         </Link>
       </div>
+
+      <AppSnackbar
+        open={snackbar.open}
+        message={snackbar.message}
+        variant={snackbar.variant}
+        onClose={() => setSnackbar((prev) => ({ ...prev, open: false }))}
+      />
     </form>
   );
 }
