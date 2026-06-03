@@ -47,3 +47,18 @@ export const useResendCodeMutation = (options = {}) =>
     mutationFn: resendCode,
     ...options,
   });
+
+  export const logoutUser = async () => {
+  const token = localStorage.getItem("token");
+  const response = await apiClient.post("/logout", null, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+  return response.data;
+};
+
+export const useLogoutMutation = (options = {}) =>
+  useMutation({
+    mutationFn: logoutUser,
+    ...options,
+  });
+

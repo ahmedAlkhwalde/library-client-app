@@ -11,7 +11,7 @@ export default function Login() {
   const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
 
   if (isAuthenticated) {
-    return <Navigate to="/app/main-page" replace />;
+    return <Navigate to="/app/dashboard" replace />;
   }
 
   return (

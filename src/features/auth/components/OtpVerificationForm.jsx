@@ -42,7 +42,7 @@ export default function OtpVerificationForm() {
         variant: "success",
       });
       navigateTimeoutRef.current = setTimeout(
-        () => navigate("/app/main-page"),
+        () => navigate("/app/dashboard"),
         500,
       );
     },
