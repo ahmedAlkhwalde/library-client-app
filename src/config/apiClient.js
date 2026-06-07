@@ -1,15 +1,16 @@
 import axios from 'axios';
 
-// 1. إنشاء نسخة مخصصة من Axios بإعدادات ثابتة
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000/api', 
-  
-  timeout: 10000, 
-  
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
+  baseURL: 'http://localhost:8000/api',
+});
+
+// Add a request interceptor to attach the token
+apiClient.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token'); // Adjust key if needed
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export default apiClient;
