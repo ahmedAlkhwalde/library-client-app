@@ -3,7 +3,9 @@ import { useSelector } from "react-redux";
 import Register from "../pages/Register.jsx";
 import Login from "../pages/Login.jsx";
 import OtpVerification from "../pages/OtpVerification.jsx";
-import  DashboardPage  from "../pages/DashboardPage.jsx";
+import DashboardPage from "../pages/DashboardPage.jsx";
+import MyBorrowingPage from "../pages/MyBorrowingPage.jsx";
+import ProfilePage from "../pages/ProfilePage.jsx";
 import MainLayout from "../layout/MainLayout.jsx";
 
 function RootRedirect() {
@@ -45,14 +47,18 @@ export const router = createBrowserRouter([
         path: "dashboard",
         element: <DashboardPage />,
       },
+      {
+        path: "myborrowing",
+        element: <MyBorrowingPage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
       // {
       //   path: "books",
       //   element: <BooksPage />,
       // },
-      // {
-      //   path: "myborrowing",
-      //   element: <BorrowRequestsView />,
-      // },
     ],
-  }
+  },
 ]);
