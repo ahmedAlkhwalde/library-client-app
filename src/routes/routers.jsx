@@ -3,13 +3,16 @@ import { useSelector } from "react-redux";
 import Register from "../pages/Register.jsx";
 import Login from "../pages/Login.jsx";
 import OtpVerification from "../pages/OtpVerification.jsx";
-import { MainPage } from "../pages/mainpage.jsx";
+import DashboardPage from "../pages/DashboardPage.jsx";
+import MyBorrowingPage from "../pages/MyBorrowingPage.jsx";
+import ProfilePage from "../pages/ProfilePage.jsx";
+import MainLayout from "../layout/MainLayout.jsx";
 
 function RootRedirect() {
   const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
   return (
     <Navigate
-      to={isAuthenticated ? "/app/main-page" : "/app/login"}
+      to={isAuthenticated ? "/app/dashboard" : "/app/login"}
       replace
     />
   );
@@ -33,7 +36,29 @@ export const router = createBrowserRouter([
     element: <OtpVerification />,
   },
   {
-    path: "/app/main-page",
-    element: <MainPage />,
+    path: "/app",
+    element: <MainLayout />,
+    children: [
+      {
+        index: true,
+        element: <Navigate to="dashboard" replace />,
+      },
+      {
+        path: "dashboard",
+        element: <DashboardPage />,
+      },
+      {
+        path: "myborrowing",
+        element: <MyBorrowingPage />,
+      },
+      {
+        path: "profile",
+        element: <ProfilePage />,
+      },
+      // {
+      //   path: "books",
+      //   element: <BooksPage />,
+      // },
+    ],
   },
 ]);

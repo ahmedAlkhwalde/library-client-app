@@ -38,7 +38,7 @@ export default function LoginForm() {
         variant: "success",
       });
       navigateTimeoutRef.current = setTimeout(
-        () => navigate("/app/main-page"),
+        () => navigate("/app/dashboard"),
         500,
       );
     },
