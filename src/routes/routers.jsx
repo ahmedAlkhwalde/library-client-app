@@ -7,6 +7,7 @@ import DashboardPage from "../pages/DashboardPage.jsx";
 import MyBorrowingPage from "../pages/MyBorrowingPage.jsx";
 import ProfilePage from "../pages/ProfilePage.jsx";
 import MainLayout from "../layout/MainLayout.jsx";
+import BooksPage from "../pages/BooksPage.jsx";
 
 function RootRedirect() {
   const isAuthenticated = useSelector((state) => state.auth?.isAuthenticated);
@@ -55,10 +56,10 @@ export const router = createBrowserRouter([
         path: "profile",
         element: <ProfilePage />,
       },
-      // {
-      //   path: "books",
-      //   element: <BooksPage />,
-      // },
+      {
+        path: "books",
+        element: <BooksPage />,
+      },
     ],
   },
 ]);
