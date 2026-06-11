@@ -6,10 +6,11 @@ import { markAllNotificationsRead } from "../features/dashboard/store/dashboardS
 
 export default function TopBar() {
   const dispatch = useDispatch();
-  
-  // استدعاء بيانات المستخدم من الـ authSlice
+
   const user = useSelector((state) => state.auth?.user);
-  const notificationsCount = useSelector((s) => s.dashboard?.notificationsCount ?? 0);
+  const notificationsCount = useSelector(
+    (s) => s.dashboard?.notificationsCount ?? 0,
+  );
   const notifications = useSelector((s) => s.dashboard?.notifications ?? []);
 
   const [notifOpen, setNotifOpen] = useState(false);
@@ -19,10 +20,9 @@ export default function TopBar() {
     if (notificationsCount > 0) dispatch(markAllNotificationsRead());
   };
 
-  // الإعدادات الأصلية مع دمج البيانات الجديدة
   const displayName = user?.name || "UserName";
-  const displayRole = "User"; // يمكن استبدالها بـ user?.role إذا لزم الأمر
-  const userImage = user?.image; 
+  const displayRole = "User"; 
+  const userImage = user?.image;
 
   return (
     <div className="hidden md:flex items-center justify-between px-6 py-3 bg-white border-b border-gray-200 shrink-0">
@@ -35,10 +35,16 @@ export default function TopBar() {
         />
         <svg
           className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"
+          />
         </svg>
         <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-300 font-mono">
           Ctrl+K
@@ -63,18 +69,30 @@ export default function TopBar() {
 
           {notifOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setNotifOpen(false)}
+              />
               <div className="absolute right-0 top-11 w-72 bg-white rounded-xl border border-gray-200 shadow-xl z-50">
                 <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <p className="text-sm font-semibold text-gray-800">Notifications</p>
-                  {notificationsCount === 0 && <span className="text-xs text-gray-400">All caught up</span>}
+                  <p className="text-sm font-semibold text-gray-800">
+                    Notifications
+                  </p>
+                  {notificationsCount === 0 && (
+                    <span className="text-xs text-gray-400">All caught up</span>
+                  )}
                 </div>
                 <ul className="divide-y divide-gray-50 max-h-64 overflow-y-auto">
                   {notifications.length === 0 ? (
-                    <li className="px-4 py-6 text-center text-xs text-gray-400">No notifications</li>
+                    <li className="px-4 py-6 text-center text-xs text-gray-400">
+                      No notifications
+                    </li>
                   ) : (
                     notifications.map((n) => (
-                      <li key={n.id} className={`px-4 py-3 text-xs text-gray-600 leading-relaxed ${n.read ? "opacity-50" : "bg-indigo-50/40"}`}>
+                      <li
+                        key={n.id}
+                        className={`px-4 py-3 text-xs text-gray-600 leading-relaxed ${n.read ? "opacity-50" : "bg-indigo-50/40"}`}
+                      >
                         {n.message}
                       </li>
                     ))
@@ -89,13 +107,21 @@ export default function TopBar() {
         <div className="flex items-center gap-2 cursor-pointer group">
           <div className="w-8 h-8 rounded-full overflow-hidden bg-indigo-600 flex items-center justify-center text-white shrink-0">
             {userImage ? (
-              <img src={userImage} alt={displayName} className="w-full h-full object-cover" />
+              <img
+                src={userImage}
+                alt={displayName}
+                className="w-full h-full object-cover"
+              />
             ) : (
-              <span className="text-sm font-semibold">{displayName.charAt(0).toUpperCase()}</span>
+              <span className="text-sm font-semibold">
+                {displayName.charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
           <div>
-            <p className="text-sm font-semibold text-gray-800 leading-none">{displayName}</p>
+            <p className="text-sm font-semibold text-gray-800 leading-none">
+              {displayName}
+            </p>
             <p className="text-xs text-gray-400 mt-0.5">{displayRole}</p>
           </div>
           <KeyboardArrowDownIcon className="!w-4 !h-4 text-gray-400 group-hover:text-gray-600 transition-colors" />
