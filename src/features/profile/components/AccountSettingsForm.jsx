@@ -29,9 +29,8 @@ export default function AccountSettingsForm({
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-500">Email Address</label>
           <input 
-            disabled={!isEditing} 
+            disabled 
             value={formData.email} 
-            onChange={(e) => setFormData({...formData, email: e.target.value})} 
             className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition-colors disabled:bg-gray-50 disabled:text-gray-400" 
           />
         </div>
@@ -39,11 +38,35 @@ export default function AccountSettingsForm({
         {/* Phone Number */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-500">Phone Number</label>
-          <input 
-            disabled={!isEditing} 
-            value={formData.phone} 
-            onChange={(e) => setFormData({...formData, phone: e.target.value})} 
-            className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition-colors disabled:bg-gray-50 disabled:text-gray-400" 
+          <input
+            disabled={!isEditing}
+            value={formData.phone}
+            onChange={(e) => {
+              // 1. السماح للمستخدم بكتابة أي شيء بحرية (دون تنسيق)
+              setFormData({ ...formData, phone: e.target.value });
+            }}
+            onBlur={(e) => {
+              let raw = e.target.value.trim();
+              if (raw === "") return;
+
+              let cleaned = raw.replace(/\s/g, "");
+
+              let formatted = cleaned;
+              if (cleaned.startsWith("+")) {
+                let rest = cleaned.substring(4); 
+                formatted = "0" + rest;
+              } else if (cleaned.startsWith("963")) {
+                let rest = cleaned.substring(3);
+                formatted = "0" + rest;
+              } else if (cleaned.startsWith("0")) {
+                formatted = cleaned;
+              } else {
+                formatted = "0" + cleaned;
+              }
+
+              setFormData({ ...formData, phone: formatted });
+            }}
+            className="w-full px-4 py-3 border border-gray-200 rounded-xl outline-none focus:border-indigo-500 transition-colors disabled:bg-gray-50 disabled:text-gray-400"
           />
         </div>
       </div>
