@@ -12,7 +12,7 @@ export const sidebarItems = [
     key: "HomePage",
     label: "HomePage",
     icon: <DashboardOutlined />,
-    to: "/app/homepage",
+    to: "/app/dashboard",
   },
   {
     key: "books",

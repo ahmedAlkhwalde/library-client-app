@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { store } from "./store/store.js";
 import { Provider } from "react-redux";
+import { Toaster } from "sonner";
 
 // 1. استيراد المكونات الجديدة والـ router المركزي الذي أنشأته
 import { RouterProvider } from "react-router-dom";
@@ -18,7 +19,8 @@ createRoot(document.getElementById("root")).render(
       <QueryClientProvider client={queryClient}>
         
         <RouterProvider router={router} />
-        
+                <Toaster richColors position="top-right" />
+
         <ReactQueryDevtools />
       </QueryClientProvider>
     </Provider>
