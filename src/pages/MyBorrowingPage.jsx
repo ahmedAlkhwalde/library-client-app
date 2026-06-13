@@ -53,25 +53,25 @@ function BorrowCard({ borrow }) {
     new Date(borrow.due_at) < new Date();
 
   return (
-    <div className="bg-white rounded-2xl border border-(--color-border) p-4 sm:p-5 flex flex-col sm:flex-row gap-4 hover:shadow-md transition-shadow">
+    <div className="bg-white rounded-2xl border border-(--color-border) p-4 sm:p-6 flex flex-col sm:flex-row gap-5 hover:shadow-md transition-shadow w-full">
       {/* Book cover */}
       <div className="shrink-0">
         {borrow.book?.image ? (
           <img
             src={borrow.book.image}
             alt={borrow.book.title}
-            className="w-16 h-20 sm:w-14 sm:h-18 object-cover rounded-lg border border-(--color-border)"
+            className="w-16 h-20 sm:w-16 sm:h-22 object-cover rounded-lg border border-(--color-border)"
           />
         ) : (
-          <div className="w-16 h-20 sm:w-14 sm:h-18 bg-(--color-accent-soft) rounded-lg flex items-center justify-center border border-(--color-border)">
+          <div className="w-16 h-20 sm:w-16 sm:h-22 bg-(--color-accent-soft) rounded-lg flex items-center justify-center border border-(--color-border)">
             <LibraryBooksOutlined className="text-(--color-accent) !text-2xl" />
           </div>
         )}
       </div>
 
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2 flex-wrap">
+      {/* Info container */}
+      <div className="flex-1">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h3 className="font-semibold text-(--color-text) text-sm sm:text-base leading-tight">
               {borrow.book?.title ?? "—"}
@@ -83,47 +83,52 @@ function BorrowCard({ borrow }) {
           <StatusBadge status={isOverdue ? "overdue" : borrow.status} />
         </div>
 
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 text-xs text-(--color-grey)">
+        {/* Inline Timestamps Row - Now wide layout with no wrap pressure */}
+        <div className="mt-4 flex flex-row flex-wrap items-center gap-x-6 gap-y-2 text-xs text-(--color-grey)">
           {borrow.requested_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Requested</span>
-              <p>{borrow.requested_at}</p>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-medium text-(--color-text)">Requested:</span>
+              <span>{borrow.requested_at}</span>
             </div>
           )}
+          
           {borrow.borrowed_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Borrowed</span>
-              <p>{borrow.borrowed_at}</p>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-medium text-(--color-text)">Borrowed:</span>
+              <span>{borrow.borrowed_at}</span>
             </div>
           )}
+          
           {borrow.due_at && (
-            <div>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
               <span
                 className={`font-medium ${isOverdue ? "text-red-600" : "text-(--color-text)"}`}
               >
-                Due
+                Due:
               </span>
-              <p className={isOverdue ? "text-red-600 font-semibold" : ""}>
+              <span className={isOverdue ? "text-red-600 font-semibold" : ""}>
                 {borrow.due_at}
-              </p>
+              </span>
             </div>
           )}
+          
           {borrow.expires_at && borrow.status === "pending" && (
-            <div>
-              <span className="font-medium text-(--color-text)">Expires</span>
-              <p>{borrow.expires_at}</p>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-medium text-(--color-text)">Expires:</span>
+              <span>{borrow.expires_at}</span>
             </div>
           )}
+          
           {borrow.returned_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Returned</span>
-              <p>{borrow.returned_at}</p>
+            <div className="flex items-center gap-1.5 whitespace-nowrap">
+              <span className="font-medium text-(--color-text)">Returned:</span>
+              <span>{borrow.returned_at}</span>
             </div>
           )}
         </div>
 
         {isOverdue && (
-          <div className="mt-2 flex items-center gap-1 text-xs text-red-600 font-medium">
+          <div className="mt-3 flex items-center gap-1 text-xs text-red-600 font-medium">
             <ErrorOutline className="!text-sm" />
             Return overdue — please return this book as soon as possible.
           </div>
@@ -161,7 +166,7 @@ export default function MyBorrowingPage() {
   };
 
   return (
-    <div className="p-4 sm:p-6 max-w-4xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-5xl mx-auto w-full">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl sm:text-2xl font-bold text-(--color-text)">
