@@ -83,44 +83,57 @@ function BorrowCard({ borrow }) {
           <StatusBadge status={isOverdue ? "overdue" : borrow.status} />
         </div>
 
-        <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1.5 text-xs text-(--color-grey)">
+        {/* Inline Timestamps Row */}
+        <div className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-xs text-(--color-grey)">
           {borrow.requested_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Requested</span>
-              <p>{borrow.requested_at}</p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-(--color-text)">Requested:</span>
+              <span>{borrow.requested_at}</span>
             </div>
           )}
+          
           {borrow.borrowed_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Borrowed</span>
-              <p>{borrow.borrowed_at}</p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-(--color-text)">Borrowed:</span>
+              <span>{borrow.borrowed_at}</span>
             </div>
           )}
+          
           {borrow.due_at && (
-            <div>
+            <div className="flex items-center gap-1.5">
               <span
                 className={`font-medium ${isOverdue ? "text-red-600" : "text-(--color-text)"}`}
               >
-                Due
+                Due:
               </span>
-              <p className={isOverdue ? "text-red-600 font-semibold" : ""}>
+              <span className={isOverdue ? "text-red-600 font-semibold" : ""}>
                 {borrow.due_at}
-              </p>
+              </span>
             </div>
           )}
+          
           {borrow.expires_at && borrow.status === "pending" && (
-            <div>
-              <span className="font-medium text-(--color-text)">Expires</span>
-              <p>{borrow.expires_at}</p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-(--color-text)">Expires:</span>
+              <span>{borrow.expires_at}</span>
             </div>
           )}
+          
           {borrow.returned_at && (
-            <div>
-              <span className="font-medium text-(--color-text)">Returned</span>
-              <p>{borrow.returned_at}</p>
+            <div className="flex items-center gap-1.5">
+              <span className="font-medium text-(--color-text)">Returned:</span>
+              <span>{borrow.returned_at}</span>
             </div>
           )}
         </div>
+
+        {isOverdue && (
+          <div className="mt-3 flex items-center gap-1 text-xs text-red-600 font-medium">
+            <ErrorOutline className="!text-sm" />
+            Return overdue — please return this book as soon as possible.
+          </div>
+        )}
+
 
         {isOverdue && (
           <div className="mt-2 flex items-center gap-1 text-xs text-red-600 font-medium">
