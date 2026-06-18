@@ -4,7 +4,7 @@ import apiClient from "../../../config/apiClient";
 export const fetchStatistics = async () => {
   const token = localStorage.getItem("token");
 
-  const response = await apiClient.get("/statistics", {
+  const response = await apiClient.get("homepage-stats", {
     headers: token
       ? { Authorization: `Bearer ${token}` }
       : undefined,

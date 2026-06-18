@@ -6,31 +6,31 @@ import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import Inventory2Icon from "@mui/icons-material/Inventory2";
 
 import StatisticCard from "./StatisticCard";
-//import { useStatisticsQuery } from "../services/statisticsService";
+import { useStatisticsQuery } from "../services/statisticsService";
 
 export default function StatisticsSection() {
-  //const { data, isLoading, isError } = useStatisticsQuery();
+  const { data, isLoading, isError } = useStatisticsQuery();
 
-//   if (isLoading) {
-//     return (
-//       <div className="flex justify-center py-10">
-//         <CircularProgress />
-//       </div>
-//     );
-//   }
+  if (isLoading) {
+    return (
+      <div className="flex justify-center py-10">
+        <CircularProgress />
+      </div>
+    );
+  }
 
-//   if (isError) {
-//     return (
-//       <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
-//         Failed to load statistics
-//       </div>
-//     );
-//   }
+  if (isError) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-600">
+        Failed to load statistics
+      </div>
+    );
+  }
 
   const cards = [
     {
       title: "Active Borrows",
-      value: 15,
+      value: data.borrowed_books,
       description: "Currently borrowed books",
       icon: <MenuBookIcon />,
       iconBg: "bg-blue-100 text-blue-600",
@@ -38,7 +38,7 @@ export default function StatisticsSection() {
     },
     {
       title: "Available Books",
-      value: 1200,
+      value: data.available_books,
       description: "Available in library",
       icon: <LibraryBooksIcon />,
       iconBg: "bg-green-100 text-green-600",
@@ -46,7 +46,7 @@ export default function StatisticsSection() {
     },
     {
       title: "Total Books",
-      value: 3245,
+      value: data.total_books,
       description: "Books in collection",
       icon: <Inventory2Icon />,
       iconBg: "bg-purple-100 text-purple-600",
@@ -54,7 +54,7 @@ export default function StatisticsSection() {
     },
     {
       title: "Overdue Borrows",
-      value: 1,
+      value: data.overdue_borrows,
       description: "Need attention",
       icon: <WarningAmberIcon />,
       iconBg: "bg-red-100 text-red-600",
